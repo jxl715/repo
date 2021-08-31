@@ -1,10 +1,16 @@
-# 使用repo 管理一个工程的多个git仓库
+# 使用google repo 管理多个git仓库
+
+
+
+## 背景
+
+一个打的工程起步的时候可能只有一个git仓库，但是随着工程的发展壮大，往往会包含多个git仓库，每个git仓库内是一个相对独立的组件，那么怎么管理这多个git仓库，来一起组合成为一个大的工程呢。Repo就是这样一个工具，它是google开发用来管理包含几百个git仓库的Android源码的工具。下面我们来看下如何使用repo来管理我们自己的多个git仓库。
 
 
 
 ## repo介绍
 
-Repo 是建立在 Git 上的一个多仓库管理工具，可以组织多个仓库的上传和下载。Repo 是 Google 用 Python 脚本写的调用 Git 的脚本，主要帮助我们管理多个 Git 存储仓库，将其上传到我们的版本控制系统，并自动执行 Android 开发工作流程的某些部分。Repo 并不是要取代 Git，而是为了领用git管理包含众多git仓库的Android源码。
+Repo 是建立在 Git 上的一个多仓库管理工具，可以组织多个仓库的上传和下载。Repo 是 Google 用 Python 脚本写的调用 Git 的脚本，主要帮助我们管理多个 Git 存储仓库，将其上传到我们的版本控制系统，并自动执行 Android 开发工作流程的某些部分。Repo 并不是要取代 Git，而是为了利用git管理包含众多git仓库的Android源码。
 
 
 
@@ -143,22 +149,30 @@ Host *
 
 
 
+## repo命令帮助
+
+```
+repo help #会列出支持的所有repo命令以及对应说明
+
+repo xxx help #查看xxx命令的帮助文档，例如想查看repo init的帮助文档，则执行 repo init help
+```
+
+
+
 ## 创建主题分支
 
-当您开始进行更改（例如当您开始处理 bug 或实现新功能）时，请在本地工作环境中新建一个主题分支。主题分支**不是**原始文件的副本；它一个指针，指向某一项提交内容，可以简化创建本地分支以及在本地分支之间进行切换的操作。通过使用分支，您可以将工作的某个方面与其他方面分隔开来。请参阅[分隔主题分支](http://www.kernel.org/pub/software/scm/git/docs/howto/separating-topic-branches.txt)（一篇有关使用主题分支的有趣文章）。
+当您开始进行更改（例如当您开始处理 bug 或实现新功能）时，请在本地工作环境中新建一个主题分支。
 
-如需使用 Repo 新建一个主题分支，请转到相应项目并运行以下命令：
+如需使用 Repo 在所有仓库新建一个主题分支，请转到相应项目并运行以下命令：
 
 ```
-repo start BRANCH_NAME .
+repo start BRANCH_NAME --all
 ```
-
-尾随句点 (` .`) 代表当前工作目录中的项目。
 
 如需验证新分支是否已创建，请运行以下命令：
 
 ```
-repo status .
+repo status
 ```
 
 ## 使用主题分支
@@ -169,41 +183,15 @@ repo status .
 repo start BRANCH_NAME PROJECT_NAME
 ```
 
-如需查看所有项目的列表，请参阅 [android.googlesource.com](https://android.googlesource.com/)。如果您已导航到相应的项目目录，则只需使用一个句点来表示当前项目即可。
+项目的列表参考工程的manifest文件。如果您已导航到相应的项目目录，则只需使用一个句点来表示当前项目即可。
 
-如需切换到本地工作环境中的另一个分支，请运行以下命令：
-
-```
-git checkout BRANCH_NAME
-```
-
-如需查看现有分支的列表，请运行以下命令：
-
-```
-git branch
-```
-
-或
+如需查看现有所有项目分支的列表，请运行以下命令：
 
 ```
 repo branches
 ```
 
-这两个命令均可返回现有分支的列表，并会在当前分支的名称前面标注星号 (*)。
-
 **注意**：如果存在错误，可能会导致 `repo sync` 重置本地主题分支。如果在您运行 `repo sync` 之后，`git branch` 显示 *（无分支），请再次运行 `git checkout`。
-
-## 暂存文件
-
-默认情况下，Git 会检测到您在项目中所做的更改，但不会跟踪这些更改。如需让 Git 保存您的更改，您必须标记或暂存这些更改，以将其纳入到提交中。
-
-如需暂存更改，请运行以下命令：
-
-```
-git add
-```
-
-此命令接受将项目目录中的文件或目录作为参数。`git add` 并不像其名称表示的这样只是简单地将文件添加到 Git 代码库，它还可以用于暂存文件的修改和删除的内容。
 
 ## 查看客户端状态
 
@@ -219,6 +207,14 @@ repo status
 repo diff
 ```
 
+如需查看单个git仓库的修改，可以直接转到对应目录执行git命令查看。
+
+```
+cd ~/WORKING_DIRECTORY/PROJECT
+git status
+git diff
+```
+
 如需查看已提交的修改（**已标记**为需要提交的本地修改），请确保您已转到相应的项目目录，然后运行包含 `cached` 参数的 `git diff`：
 
 ```
@@ -226,13 +222,13 @@ cd ~/WORKING_DIRECTORY/PROJECT
 git diff --cached
 ```
 
-## 提交更改
+## 暂存以及提交更改
 
 在 Git 中，提交是修订版本控制的基本单位，包含目录结构的快照以及整个项目的文件内容。 您可以使用以下命令在 Git 中创建提交：
 
 ```
+cd ~/WORKING_DIRECTORY/PROJECT
+git add . 
 git commit
 ```
-
-当系统提示您输入提交消息时，请针对要提交至 AOSP 的更改提供一条简短（但有帮助）的消息。如果您不添加提交消息，提交将会失败。
 
