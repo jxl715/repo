@@ -47,9 +47,9 @@ chmod a+x ~/bin/repo
            remote="origin"
            sync-j="4" />
 
-  <project path="lazada_main" name="lazada_main.git" />
+  <project path="subProject1" name="subProject1.git" />
 
-  <project path="lazandroid_homepage_aar" name="lazandroid_homepage_aar.git" />
+  <project path="subProject2" name="subProject2.git" />
 
 </manifest>
 ```
